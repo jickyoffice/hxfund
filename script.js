@@ -230,7 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { num: '1', title: '数据采集', desc: '管理员在后台录入族人信息，包含姓名、生卒年、籍贯、世系ID等关键字段' },
         { num: '2', title: 'SHA-256 哈希', desc: '服务端对关键字段组合进行 SHA-256 加密，生成唯一数字指纹（Hash）' },
         { num: '3', title: '链上存证', desc: '调用政务区块链网关，将 Hash 值打包成区块上链，获取交易回执（TX ID）' },
-        { num: '4', title: '结果回写', desc: '将交易ID和区块高度存入 t_blockchain_cert 表，完成双链路存证' }
+        { num: '4', title: '结果回写', desc: '将交易ID和区块高度存入 t_blockchain_cert 表，完成双链路存证' },
+        { num: '5', title: '存证验证', desc: '系统定期验证链上数据完整性，确保哈希值与原始数据匹配，保障数据可信度' },
+        { num: '6', title: '存证查询', desc: '提供便捷的查询接口，用户可通过族人ID或哈希值验证数据真实性，实现公开透明' }
     ];
 
     /** 区块链示例记录 */
@@ -868,6 +870,256 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     }
+
+
+    // ============================================================
+    //  模块七：Qwen AI 客户端
+    // ============================================================
+    const qwenMessages = document.getElementById('qwenMessages');
+    const qwenInput = document.getElementById('qwenInput');
+    const qwenSendBtn = document.getElementById('qwenSendBtn');
+    const qwenTokens = document.getElementById('qwenTokens');
+    const qwenModelSelect = document.getElementById('qwenModelSelect');
+    const qwenTemperature = document.getElementById('qwenTemperature');
+    const tempValue = document.getElementById('tempValue');
+    const qwenApiKey = document.getElementById('qwenApiKey');
+    const qwenSaveConfig = document.getElementById('qwenSaveConfig');
+
+    // 获取图片上传相关元素
+    const qwenImageUpload = document.getElementById('qwenImageUpload');
+    const qwenImagePreview = document.getElementById('qwenImagePreview');
+    
+    // 当前选中的图片文件
+    let selectedImageFile = null;
+
+    // 从localStorage加载配置
+    function loadQwenConfig() {
+        const savedConfig = localStorage.getItem('qwenConfig');
+        if (savedConfig) {
+            const config = JSON.parse(savedConfig);
+            qwenModelSelect.value = config.model || 'qwen-turbo';
+            qwenTemperature.value = config.temperature || '0.7';
+            tempValue.textContent = config.temperature || '0.7';
+            qwenApiKey.value = config.apiKey || '';
+        }
+    }
+
+    // 保存配置到localStorage
+    function saveQwenConfig() {
+        const config = {
+            model: qwenModelSelect.value,
+            temperature: qwenTemperature.value,
+            apiKey: qwenApiKey.value
+        };
+        localStorage.setItem('qwenConfig', JSON.stringify(config));
+        alert('配置已保存！');
+    }
+
+    // 图片上传处理
+    qwenImageUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // 验证文件类型
+            if (!file.type.match('image.*')) {
+                alert('请选择图片文件');
+                return;
+            }
+            
+            // 检查文件大小（限制为5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片文件大小不能超过5MB');
+                return;
+            }
+            
+            selectedImageFile = file;
+            
+            // 显示图片预览
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                qwenImagePreview.innerHTML = `<img src="${event.target.result}" alt="预览图片">`;
+                qwenImagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 更新温度值显示
+    qwenTemperature.addEventListener('input', () => {
+        tempValue.textContent = qwenTemperature.value;
+    });
+
+    // 保存配置按钮事件
+    qwenSaveConfig.addEventListener('click', saveQwenConfig);
+
+    // 初始化配置
+    loadQwenConfig();
+
+    // 添加消息到聊天窗口
+    function addMessage(role, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `qwen-message ${role}-message`;
+        
+        const avatarClass = role === 'user' ? 'user-avatar' : 'ai-avatar';
+        const avatarEmoji = role === 'user' ? '👤' : '🤖';
+        const nameText = role === 'user' ? '您' : 'Qwen AI';
+        
+        messageDiv.innerHTML = `
+            <div class="qwen-avatar ${avatarClass}">${avatarEmoji}</div>
+            <div class="qwen-content">
+                <div class="qwen-name">${nameText}</div>
+                <div class="qwen-text">${content}</div>
+            </div>
+        `;
+        
+        qwenMessages.appendChild(messageDiv);
+        qwenMessages.scrollTop = qwenMessages.scrollHeight;
+    }
+
+    // 计算token数量（简单估算）
+    function estimateTokens(text) {
+        // 简单估算：中文字符按1个token计算，英文单词按1个token计算
+        const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+        const englishWords = text.replace(/[\u4e00-\u9fa5]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).length;
+        return chineseChars + englishWords;
+    }
+
+    // 发送消息到Qwen API（真实实现，支持多模态）
+    async function sendMessageToQwen(message, imageFile = null) {
+        // 显示加载状态
+        const loadingMsg = document.createElement('div');
+        loadingMsg.className = 'qwen-message ai-message';
+        loadingMsg.innerHTML = `
+            <div class="qwen-avatar ai-avatar">🤖</div>
+            <div class="qwen-content">
+                <div class="qwen-name">Qwen AI</div>
+                <div class="qwen-text"><i>正在思考中...</i></div>
+            </div>
+        `;
+        qwenMessages.appendChild(loadingMsg);
+        qwenMessages.scrollTop = qwenMessages.scrollHeight;
+
+        try {
+            // 获取配置
+            const config = JSON.parse(localStorage.getItem('qwenConfig')) || {};
+            const apiKey = config.apiKey || '';
+            const model = config.model || 'qwen-turbo';
+            const temperature = parseFloat(config.temperature) || 0.7;
+
+            // 检查API密钥
+            if (!apiKey) {
+                throw new Error('请先在配置面板中输入API密钥');
+            }
+
+            // 调用真实的Qwen API（支持多模态）
+            // 注意：出于安全考虑，前端直接调用API密钥存在风险
+            // 实际部署时，建议通过后端代理API请求
+            const response = await callQwenAPI(message, model, temperature, apiKey, imageFile);
+
+            // 移除加载状态
+            qwenMessages.removeChild(loadingMsg);
+
+            // 添加真实响应
+            addMessage('ai', response);
+
+            // 更新token统计（简化计算）
+            const tokens = estimateTokens(message + response);
+            qwenTokens.textContent = tokens;
+
+        } catch (error) {
+            // 移除加载状态
+            qwenMessages.removeChild(loadingMsg);
+
+            // 添加错误消息
+            addMessage('ai', `抱歉，出现了一个错误：${error.message || '请求失败'}`);
+        }
+    }
+
+    // 调用Qwen API的函数（通过后端代理，支持多模态）
+    async function callQwenAPI(prompt, model, temperature, apiKey, imageFile = null) {
+        // 通过后端代理调用API以保护API密钥
+        const proxyUrl = '/api/qwen';  // 后端代理端点
+        
+        // 准备请求数据
+        const requestData = {
+            prompt: prompt,
+            model: model,
+            temperature: temperature,
+            hasImage: !!imageFile  // 标识是否有图片
+        };
+
+        // 如果有图片，则转换为base64
+        if (imageFile) {
+            const reader = new FileReader();
+            try {
+                // 这里我们不能直接等待FileReader，因为它使用回调
+                // 我们需要使用Promise包装
+                const imageBase64 = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result.split(',')[1]); // 获取base64部分
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imageFile);
+                });
+                
+                requestData.image = imageBase64;
+                requestData.imageType = imageFile.type;
+            } catch (error) {
+                console.error('图片处理错误:', error);
+            }
+        }
+
+        try {
+            const response = await fetch(proxyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `API请求失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.response;
+        } catch (error) {
+            console.error('API调用错误:', error);
+            // 如果API调用失败，返回一个模拟响应
+            return `API调用失败: ${error.message}。请检查API密钥是否正确配置在服务器端，以及网络连接是否正常。`;
+        }
+    }
+
+    // 发送按钮事件
+    qwenSendBtn.addEventListener('click', async () => {
+        const message = qwenInput.value.trim();
+        if (!message && !selectedImageFile) {
+            shakeElement(qwenInput);
+            return;
+        }
+
+        // 添加用户消息（包含图片信息）
+        let messageContent = message;
+        if (selectedImageFile) {
+            messageContent = `[图片: ${selectedImageFile.name}] ${message}`;
+        }
+        addMessage('user', messageContent);
+
+        // 清空输入框和图片预览
+        qwenInput.value = '';
+        qwenImagePreview.style.display = 'none';
+        selectedImageFile = null;
+
+        // 发送消息到Qwen（包含图片）
+        await sendMessageToQwen(message, selectedImageFile);
+    });
+
+    // Enter键发送消息（Ctrl+Enter换行）
+    qwenInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+            e.preventDefault();
+            qwenSendBtn.click();
+        }
+    });
 
 
     // ============================================================

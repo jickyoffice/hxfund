@@ -32,8 +32,8 @@
                 <a href="#home" class="nav-link active" id="nav-home">首页</a>
                 <a href="#tree" class="nav-link" id="nav-tree">族谱</a>
                 <a href="#calculator" class="nav-link" id="nav-calculator">字辈</a>
+                <a href="#qwen" class="nav-link" id="nav-qwen">Qwen AI</a>
                 <a href="#ppt" class="nav-link" id="nav-ppt">介绍</a>
-                <a href="#database" class="nav-link" id="nav-database">架构</a>
                 <a href="#blockchain" class="nav-link" id="nav-blockchain">存证</a>
                 <a href="#guestbook" class="nav-link" id="nav-guestbook">留言</a>
             </nav>
@@ -164,31 +164,83 @@
         </div>
     </section>
 
-    <!-- 模块五：数据库结构设计 -->
-    <section id="database" class="section bg-alt">
+
+    <!-- 模块四：Qwen AI 客户端 -->
+    <section id="qwen" class="section bg-alt">
         <div class="container">
             <div class="section-header">
-                <div class="section-badge">DATABASE ARCHITECTURE</div>
-                <h2 class="section-title">后端数据库结构</h2>
-                <p class="section-desc">采用关系型数据库存储族谱数据，支持复杂的血缘关系查询</p>
+                <div class="section-badge">QWEN AI</div>
+                <h2 class="section-title">Qwen AI 客户端</h2>
+                <p class="section-desc">与阿里云通义千问AI模型进行对话，获取智能化服务</p>
             </div>
-            <div class="erd-container">
-                <div class="erd-legend">
-                    <span class="legend-item"><span class="legend-dot pk"></span>PK 主键</span>
-                    <span class="legend-item"><span class="legend-dot fk"></span>FK 外键</span>
-                    <span class="legend-item"><span class="legend-dot idx"></span>INDEX</span>
+            <div class="qwen-layout">
+                <div class="qwen-chat-container card">
+                    <div class="qwen-messages" id="qwenMessages">
+                        <div class="qwen-message welcome-message">
+                            <div class="qwen-avatar ai-avatar">🤖</div>
+                            <div class="qwen-content">
+                                <div class="qwen-name">Qwen AI</div>
+                                <div class="qwen-text">您好！我是通义千问AI助手，专门为您解答关于黄氏家族寻根的相关问题。您可以问我关于族谱、字辈、历史等方面的问题。</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="qwen-input-area">
+                        <div class="qwen-multimodal-input">
+                            <textarea id="qwenInput" placeholder="请输入您想咨询的问题...（例如：黄姓的起源是什么？）"></textarea>
+                            <div class="qwen-image-upload">
+                                <label for="qwenImageUpload" class="image-upload-label">
+                                    <span class="upload-icon">🖼️</span>
+                                    <span class="upload-text">上传图片</span>
+                                </label>
+                                <input type="file" id="qwenImageUpload" accept="image/*" style="display: none;">
+                                <div id="qwenImagePreview" class="image-preview"></div>
+                            </div>
+                        </div>
+                        <div class="qwen-input-footer">
+                            <button id="qwenSendBtn" class="btn-primary">
+                                <span>发送</span>
+                                <span class="btn-icon">➤</span>
+                            </button>
+                            <div class="qwen-tokens">
+                                <span>Token用量:</span>
+                                <span id="qwenTokens">0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="erd-diagram" id="erdDiagram">
-                    <!-- ERD 由 JS 渲染 -->
-                </div>
-                <div class="erd-relations" id="erdRelations">
-                    <!-- 关系说明 -->
+                
+                <div class="qwen-config-panel card">
+                    <h3 class="bc-subtitle">⚙️ 参数配置</h3>
+                    <div class="qwen-form">
+                        <div class="form-group">
+                            <label for="qwenModelSelect">选择模型</label>
+                            <select id="qwenModelSelect">
+                                <option value="qwen3.5-plus">Qwen3.5-Plus (多模态)</option>
+                                <option value="qwen-max">Qwen-Max (复杂任务)</option>
+                                <option value="qwen-plus">Qwen-Plus (平衡性能)</option>
+                                <option value="qwen-turbo">Qwen-Turbo (快速响应)</option>
+                                <option value="qwen-mini">Qwen-Mini (轻量高效)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="qwenTemperature">温度 (Creativity)</label>
+                            <input type="range" id="qwenTemperature" min="0" max="1" step="0.1" value="0.7">
+                            <span id="tempValue">0.7</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="qwenApiKey">API密钥</label>
+                            <input type="password" id="qwenApiKey" placeholder="输入您的API密钥">
+                        </div>
+                        <button id="qwenSaveConfig" class="btn-primary" style="width:100%;margin-top:10px;">
+                            <span>保存配置</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 模块六：区块链认证 -->
+    <!-- 模块五：区块链认证 -->
     <section id="blockchain" class="section">
         <div class="container">
             <div class="section-header">
@@ -234,7 +286,7 @@
         </div>
     </section>
 
-    <!-- 模块四：宗亲留言墙 -->
+    <!-- 模块六：宗亲留言墙 -->
     <section id="guestbook" class="section bg-alt">
         <div class="container">
             <div class="section-header">
@@ -314,6 +366,7 @@
                 <a href="#home">首页</a>
                 <a href="#tree">族谱树</a>
                 <a href="#calculator">字辈推算</a>
+                <a href="#qwen">Qwen AI</a>
                 <a href="#ppt">项目愿景</a>
                 <a href="#blockchain">区块链存证</a>
                 <a href="#guestbook">留言墙</a>
