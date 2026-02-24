@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>黄氏家族寻根平台 · 项目白皮书 v1.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B4513;
+            --primary-dark: #6B3410;
+            --gold: #C8933A;
+            --gold-light: #E8BF7A;
+            --bg: #f5f3e8;
+            --bg-card: #fffbf0;
+            --bg-dark: #2d1a0e;
+            --border: #d4c8a5;
+            --text: #2c1a0e;
+            --text-mid: #5d4037;
+            --text-light: #8d6e63;
+            --font: 'Noto Serif SC', STKaiti, serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        /* Cover */
+        .cover {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #2d1a0e, #4a2c18, #2d1a0e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(200, 147, 58, .15), transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(139, 69, 19, .2), transparent 60%);
+        }
+
+        .cover-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+        }
+
+        .cover-seal {
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--gold);
+            margin: 0 auto 32px;
+            box-shadow: 0 0 40px rgba(200, 147, 58, .3);
+        }
+
+        .cover-label {
+            font-size: .8rem;
+            letter-spacing: 5px;
+            color: rgba(255, 248, 240, .5);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .cover-title {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 900;
+            color: #fff8f0;
+            letter-spacing: 6px;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .cover-sub {
+            font-size: 1.1rem;
+            color: var(--gold-light);
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: .85rem;
+            color: rgba(255, 248, 240, .55);
+            letter-spacing: 2px;
+        }
+
+        .cover-meta span {
+            border-left: 2px solid var(--gold);
+            padding-left: 12px;
+        }
+
+        .cover-divider {
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 32px auto;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .page {
+            padding: 70px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page:last-child {
+            border-bottom: none;
+        }
+
+        .page-bg {
+            background: linear-gradient(135deg, #ede8d5, var(--bg));
+        }
+
+        /* Section headers */
+        .ch-num {
+            font-size: .75rem;
+            letter-spacing: 4px;
+            color: var(--gold);
+            font-family: Arial, sans-serif;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .ch-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        .ch-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--primary));
+        }
+
+        .ch-desc {
+            color: var(--text-light);
+            font-size: .95rem;
+            margin-top: 16px;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(62, 39, 35, .1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--primary), var(--gold));
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Typography */
+        h3.sub {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: var(--text-mid);
+            font-size: .95rem;
+            line-height: 1.9;
+            margin-bottom: 12px;
+        }
+
+        ul,
+        ol {
+            padding-left: 20px;
+            color: var(--text-mid);
+            font-size: .95rem;
+            line-height: 2;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* Highlight box */
+        .highlight {
+            background: linear-gradient(135deg, rgba(200, 147, 58, .08), rgba(139, 69, 19, .05));
+            border: 1.5px dashed var(--gold);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .highlight p {
+            margin: 0;
+            color: var(--text-mid);
+        }
+
+        /* Stat cards */
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-num {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-unit {
+            font-size: .85rem;
+            color: var(--gold);
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .stat-label {
+            font-size: .8rem;
+            color: var(--text-light);
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--gold), var(--border));
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg-card);
+            box-shadow: 0 0 8px rgba(200, 147, 58, .4);
+        }
+
+        .tl-year {
+            font-size: .8rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 2px;
+            font-family: Arial, sans-serif;
+        }
+
+        .tl-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 2px 0;
+        }
+
+        .tl-desc {
+            font-size: .87rem;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Table */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .88rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-mid);
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: rgba(139, 69, 19, .04);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+
+        .badge-gold {
+            background: rgba(200, 147, 58, .15);
+            color: #8a6200;
+        }
+
+        .badge-blue {
+            background: rgba(52, 152, 219, .12);
+            color: #1a5276;
+        }
+
+        .badge-green {
+            background: rgba(46, 204, 113, .12);
+            color: #1a7040;
+        }
+
+        /* Step flow */
+        .steps {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .step-item {
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+            padding: 20px 12px;
+            position: relative;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, .3);
+        }
+
+        .step-name {
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .step-sub {
+            font-size: .75rem;
+            color: var(--text-light);
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        /* Risk table color */
+        .risk-high {
+            color: #c0392b;
+            font-weight: 700;
+        }
+
+        .risk-mid {
+            color: #e67e22;
+            font-weight: 700;
+        }
+
+        .risk-low {
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 32px;
+        }
+
+        .toc-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+
+        .toc ol {
+            counter-reset: toc;
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            counter-increment: toc;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc li::before {
+            content: counter(toc, cjk-ideographic);
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .72rem;
+            flex-shrink: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .toc a {
+            color: var(--text-mid);
+            text-decoration: none;
+            font-size: .93rem;
+            flex: 1;
+        }
+
+        .toc a:hover {
+            color: var(--primary);
+        }
+
+        .toc .pg {
+            color: var(--text-light);
+            font-size: .8rem;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Footer */
+        .wp-footer {
+            background: var(--bg-dark);
+            color: #fff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .wp-footer p {
+            color: rgba(255, 248, 240, .45);
+            font-size: .82rem;
+            line-height: 2;
+            letter-spacing: 1px;
+        }
+
+        .wp-footer .f-logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        /* Print */
+        @media print {
+            .cover {
+                min-height: auto;
+                padding: 40px;
+            }
+
+            .page {
+                break-inside: avoid;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+
+        @media(max-width:768px) {
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                flex-direction: column;
+            }
+
+            .step-item:not(:last-child)::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -14px;
+                transform: translateX(50%);
+            }
+
+            .step-item {
+                padding-bottom: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 封面 -->
+    <div class="cover">
+        <div class="cover-inner">
+            <div class="cover-seal">黄</div>
+            <div class="cover-label">Project White Paper · Version 1.0</div>
+            <h1 class="cover-title">黄氏家族寻根平台</h1>
+            <div class="cover-sub">hxfund.cn · 数字化族谱 · 区块链存证 · 宗亲连接</div>
+            <div class="cover-divider"></div>
+            <div class="cover-meta">
+                <span>版本：v1.0</span>
+                <span>发布：2024年</span>
+                <span>机密等级：公开版</span>
+                <span>编制：黄氏寻根平台技术委员会</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 目录 -->
+    <section class="page">
+        <div class="container">
+            <div class="ch-num">TABLE OF CONTENTS</div>
+            <h2 class="ch-title">目录</h2>
+            <div class="toc">
+                <div class="toc-title">白皮书章节导览</div>
+                <ol>
+                    <li><a href="#ch1">执行摘要</a><span class="pg">§ 1</span></li>
+                    <li><a href="#ch2">项目背景与痛点分析</a><span class="pg">§ 2</span></li>
+                    <li><a href="#ch3">平台功能架构</a><span class="pg">§ 3</span></li>
+                    <li><a href="#ch4">技术架构设计</a><span class="pg">§ 4</span></li>
+                    <li><a href="#ch5">数据库结构设计（ERD）</a><span class="pg">§ 5</span></li>
+                    <li><a href="#ch6">区块链存证体系</a><span class="pg">§ 6</span></li>
+                    <li><a href="#ch7">隐私保护与身份认证</a><span class="pg">§ 7</span></li>
+                    <li><a href="#ch8">市场分析与用户画像</a><span class="pg">§ 8</span></li>
+                    <li><a href="#ch9">发展路线图（Roadmap）</a><span class="pg">§ 9</span></li>
+                    <li><a href="#ch10">风险评估与应对策略</a><span class="pg">§ 10</span></li>
+                    <li><a href="#ch11">团队与合规声明</a><span class="pg">§ 11</span></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 1 执行摘要 -->
+    <section class="page page-bg" id="ch1">
+        <div class="container">
+            <div class="ch-num">CHAPTER 01</div>
+            <h2 class="ch-title">执行摘要</h2>
+            <p class="ch-desc">本白皮书阐述黄氏家族寻根平台（hxfund.cn）的技术架构、商业逻辑与发展规划，供宗亲代表、技术合作伙伴及投资方参考。</p>
+
+            <div class="highlight">
+                <p><strong>核心定位：</strong>黄氏家族寻根平台是一个融合<strong>数字族谱管理、区块链数据存证与宗亲社群互动</strong>的垂直文化科技平台。依托现代Web技术与联盟区块链，为全球超过<strong>3200万黄氏族人</strong>提供可信赖的寻根、问祖、续谱服务。
+                </p>
+            </div>
+
+            <div class="grid-3" style="margin-top:32px;">
+                <div class="card stat-card">
+                    <div class="stat-num">3200<span class="stat-unit">万</span></div>
+                    <div class="stat-label">全球黄氏宗亲</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-num">4600<span class="stat-unit">年</span></div>
+                    <div class="stat-label">黄姓历史传承</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-num">28<span class="stat-unit">省</span></div>
+                    <div class="stat-label">国内分布区域</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:24px;">
+                <div class="card">
+                    <h3 class="sub">🎯 核心价值主张</h3>
+                    <ul>
+                        <li><strong>可信：</strong>区块链哈希存证，数据不可篡改</li>
+                        <li><strong>可查：</strong>智能字辈推算，一键定位世系</li>
+                        <li><strong>可连：</strong>留言墙与宗亲认证，跨地域连接</li>
+                        <li><strong>可传：</strong>数字化老谱存储，守护文化资产</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">📌 核心优势</h3>
+                    <ul>
+                        <li>纯静态SPA，无服务器成本，可全球CDN分发</li>
+                        <li>接入政务区块链，具备天然公信力</li>
+                        <li>支持国产化数据库（达梦/人大金仓）</li>
+                        <li>符合《个人信息保护法》数据分级标准</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 2 背景与痛点 -->
+    <section class="page" id="ch2">
+        <div class="container">
+            <div class="ch-num">CHAPTER 02</div>
+            <h2 class="ch-title">项目背景与痛点分析</h2>
+            <p class="ch-desc">中国家谱文化有数千年历史，但传统族谱管理面临严重的数字化缺口。</p>
+
+            <h3 class="sub" style="margin-bottom:16px;">行业现状</h3>
+            <p>黄姓为中国第七大姓，拥有约3200万族人，广泛分布于湖北、江西、广东、福建、台湾及东南亚。现存各类黄氏族谱逾万册，但绝大多数仍以纸质形式保存，面临虫蛀、火灾、遗失等不可逆损毁风险。</p>
+
+            <div class="grid-2" style="margin-top:28px;">
+                <div class="card">
+                    <h3 class="sub">❌ 现存核心痛点</h3>
+                    <ul>
+                        <li>纸质族谱易损毁，数字化率不足<strong>5%</strong></li>
+                        <li>各地谱局各自为政，数据孤岛严重</li>
+                        <li>族谱数据易篡改，真实性无法核验</li>
+                        <li>字辈查询依赖口耳相传，错误率高</li>
+                        <li>散居海外宗亲寻根无门，信息断层</li>
+                        <li>老谱扫描件版权归属不清，数字确权难</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">✅ 平台解决方案</h3>
+                    <ul>
+                        <li>数字化存储，多地容灾备份</li>
+                        <li>统一数据模型，支持多分支合并</li>
+                        <li>SHA-256 哈希链上存证，防篡改可溯源</li>
+                        <li>智能字辈计算器，覆盖全部主要分支</li>
+                        <li>多语言支持 + 全球CDN，海外宗亲可达</li>
+                        <li>NFT/区块链存证赋予老谱数字版权</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top:28px;">
+                <p>📊 <strong>市场规模参考：</strong>据中华炎黄文化研究会估算，中国每年用于修谱、寻根的文化消费市场规模超过
+                    <strong>50亿元人民币</strong>，且随着数字经济发展，年均增速约 <strong>18%</strong>。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 3 平台功能 -->
+    <section class="page page-bg" id="ch3">
+        <div class="container">
+            <div class="ch-num">CHAPTER 03</div>
+            <h2 class="ch-title">平台功能架构</h2>
+            <p class="ch-desc">平台由六大核心功能模块构成，满足不同层次用户需求。</p>
+
+            <div class="grid-2" style="gap:20px;">
+                <div class="card">
+                    <h3 class="sub">🌳 模块一：3D 动态族谱树</h3>
+                    <p>递归渲染家族世系图，支持多代展开/折叠，点击族人节点查看详细档案（生平、籍贯、区块链存证状态）。始祖节点金色高亮，视觉层次清晰。</p>
+                    <p><span class="badge badge-gold">核心功能</span> <span class="badge badge-green">响应式</span></p>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🧮 模块二：智能字辈计算器</h3>
+                    <p>内置江夏、石城、绵阳、福建等四大黄氏主要分支完整字辈诗，输入代数自动取余匹配，高亮显示当前字辈并展示前后序列，一秒查清字辈归属。</p>
+                    <p><span class="badge badge-gold">核心功能</span> <span class="badge badge-blue">4个分支</span></p>
+                </div>
+                <div class="card">
+                    <h3 class="sub">📊 模块三：项目白皮书展示</h3>
+                    <p>支持触摸/拖拽/键盘操作的幻灯片轮播，自动播放，展示项目愿景、技术架构、发展路线图，可作为对外路演的在线演示工具。</p>
+                    <p><span class="badge badge-blue">可拖拽</span> <span class="badge badge-green">自动播放</span></p>
+                </div>
+                <div class="card">
+                    <h3 class="sub">⛓️ 模块四：区块链存证核验</h3>
+                    <p>展示完整的四步存证流程，提供在线核验工具，输入族人ID或哈希值即可验证数据真实性，显示链上交易ID、区块高度和存证时间。</p>
+                    <p><span class="badge badge-gold">防篡改</span> <span class="badge badge-blue">可溯源</span></p>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🗄️ 模块五：数据库架构可视化</h3>
+                    <p>将后端5张核心数据表以可视化ERD形式呈现，标注PK/FK关系，展示表间关联逻辑，便于技术合作伙伴快速理解数据模型。</p>
+                    <p><span class="badge badge-blue">技术文档</span> <span class="badge badge-green">ERD图</span></p>
+                </div>
+                <div class="card">
+                    <h3 class="sub">✉️ 模块六：宗亲留言墙</h3>
+                    <p>基于 localStorage 的持久化留言系统，支持姓名自定义、300字限制、倒序展示，预置寻亲示例留言。未来对接后端后可实现跨设备同步。</p>
+                    <p><span class="badge badge-green">互动功能</span> <span class="badge badge-gold">LocalStorage</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 4 技术架构 -->
+    <section class="page" id="ch4">
+        <div class="container">
+            <div class="ch-num">CHAPTER 04</div>
+            <h2 class="ch-title">技术架构设计</h2>
+            <p class="ch-desc">采用前后端分离架构，前端静态SPA + 后端RESTful API + 区块链存证网关三层解耦设计。</p>
+
+            <h3 class="sub">技术选型矩阵</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>层级</th>
+                            <th>技术选型</th>
+                            <th>说明</th>
+                            <th>国产化备选</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>前端展示</td>
+                            <td>HTML5 + CSS3 + Vanilla JS (ES6)</td>
+                            <td>零依赖、极致兼容、SEO友好</td>
+                            <td>同</td>
+                        </tr>
+                        <tr>
+                            <td>后端框架</td>
+                            <td>Spring Boot 3.x / FastAPI</td>
+                            <td>成熟生态，支持高并发</td>
+                            <td>若依框架</td>
+                        </tr>
+                        <tr>
+                            <td>主数据库</td>
+                            <td>MySQL 8.0 / PostgreSQL</td>
+                            <td>关系型，支持复杂血缘关系查询</td>
+                            <td>达梦 / 人大金仓</td>
+                        </tr>
+                        <tr>
+                            <td>缓存层</td>
+                            <td>Redis 7.x</td>
+                            <td>高频字辈查询缓存，降低DB压力</td>
+                            <td>同</td>
+                        </tr>
+                        <tr>
+                            <td>对象存储</td>
+                            <td>AWS S3 / 阿里云OSS</td>
+                            <td>老谱扫描件、头像图片存储</td>
+                            <td>华为OBS</td>
+                        </tr>
+                        <tr>
+                            <td>区块链</td>
+                            <td>百度超级链 / 腾讯TrustSQL</td>
+                            <td>联盟链，合规存证</td>
+                            <td>省级政务链</td>
+                        </tr>
+                        <tr>
+                            <td>容器化</td>
+                            <td>Docker + Kubernetes</td>
+                            <td>弹性扩缩容，多地容灾</td>
+                            <td>同</td>
+                        </tr>
+                        <tr>
+                            <td>CDN</td>
+                            <td>Cloudflare / 阿里云CDN</td>
+                            <td>全球加速，海外宗亲低延迟访问</td>
+                            <td>同</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="grid-2" style="margin-top:28px;">
+                <div class="card">
+                    <h3 class="sub">🏗️ 前端架构原则</h3>
+                    <ul>
+                        <li>纯静态文件，可部署至任意CDN或对象存储</li>
+                        <li>无框架依赖，首屏加载 &lt; 1.5s</li>
+                        <li>Vanilla JS 模块化组织，按需渲染</li>
+                        <li>IntersectionObserver 驱动滚动动画</li>
+                        <li>完全响应式，适配手机/平板/桌面</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🔧 后端架构原则</h3>
+                    <ul>
+                        <li>RESTful API 设计，前后端完全解耦</li>
+                        <li>JWT + Redis 实现无状态鉴权</li>
+                        <li>分级缓存策略：L1 本地缓存 + L2 Redis</li>
+                        <li>异步消息队列处理区块链上链任务</li>
+                        <li>数据库读写分离，主从架构</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 5 数据库 ERD -->
+    <section class="page page-bg" id="ch5">
+        <div class="container">
+            <div class="ch-num">CHAPTER 05</div>
+            <h2 class="ch-title">数据库结构设计（ERD）</h2>
+            <p class="ch-desc">采用关系型数据库，以 t_relation 关联表为核心，支持父子、婚姻、兄弟等复杂血缘关系。</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>表名</th>
+                            <th>中文名</th>
+                            <th>核心字段</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>t_member</strong></td>
+                            <td>家族成员表</td>
+                            <td>id · name · generation · birth_date · death_date · gender · location · bio · avatar_url
+                            </td>
+                            <td>族人基础档案，generation 字段快速定位字辈</td>
+                        </tr>
+                        <tr>
+                            <td><strong>t_relation</strong></td>
+                            <td>关系关联表</td>
+                            <td>id · ancestor_id(FK) · descendant_id(FK) · relation_type · sort_order</td>
+                            <td>核心表，relation_type: 1=父子 2=婚姻 3=兄弟</td>
+                        </tr>
+                        <tr>
+                            <td><strong>t_generation_words</strong></td>
+                            <td>字辈字典表</td>
+                            <td>id · branch_name · words_sequence · description</td>
+                            <td>各分支字辈诗存储，支持无限扩展分支</td>
+                        </tr>
+                        <tr>
+                            <td><strong>t_blockchain_cert</strong></td>
+                            <td>区块链存证表</td>
+                            <td>id · resource_id · resource_type · hash_value · blockchain_tx_id · block_height ·
+                                cert_time</td>
+                            <td>记录每条数据的链上指纹与交易回执</td>
+                        </tr>
+                        <tr>
+                            <td><strong>t_user</strong></td>
+                            <td>系统用户表</td>
+                            <td>id · username · password_hash · real_name · role · status</td>
+                            <td>role: 0=游客 1=宗亲 2=管理员，分级权限</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="highlight" style="margin-top:24px;">
+                <p>📐 <strong>设计说明：</strong>t_relation 采用有向图模型存储血缘关系，ancestor_id 与 descendant_id 均外键引用 t_member.id，通过
+                    relation_type 区分关系类型，支持以递归CTE查询任意深度的世系路径，时间复杂度 O(n)，满足万人级族谱查询需求。</p>
+            </div>
+
+            <div class="grid-2" style="margin-top:28px;">
+                <div class="card">
+                    <h3 class="sub">⚡ 查询优化策略</h3>
+                    <ul>
+                        <li>generation 字段建立B-Tree索引，字辈查询 O(log n)</li>
+                        <li>ancestor_id + descendant_id 联合索引，关系查询极速</li>
+                        <li>name + location 全文索引，支持模糊寻亲搜索</li>
+                        <li>Redis 缓存热点世系数据，缓存命中率 &gt;85%</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🔒 数据安全设计</h3>
+                    <ul>
+                        <li>敏感字段（birth_date 等）加密存储（AES-256）</li>
+                        <li>软删除机制，数据操作全程可逆可审计</li>
+                        <li>create_time + update_time 字段，完整操作时间线</li>
+                        <li>数据库审计日志，所有写操作留痕</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 6 区块链 -->
+    <section class="page" id="ch6">
+        <div class="container">
+            <div class="ch-num">CHAPTER 06</div>
+            <h2 class="ch-title">区块链存证体系</h2>
+            <p class="ch-desc">采用"哈希上链"机制，明文数据留存本地数据库，仅将数据指纹上链，兼顾隐私保护与防篡改需求。</p>
+
+            <h3 class="sub" style="margin-bottom:20px;">存证流程（四步法）</h3>
+            <div class="steps">
+                <div class="step-item">
+                    <div class="step-circle">📝</div>
+                    <div class="step-name">数据采集</div>
+                    <div class="step-sub">管理员录入<br>族人关键信息</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle">#</div>
+                    <div class="step-name">哈希计算</div>
+                    <div class="step-sub">服务端 SHA-256<br>生成唯一指纹</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle">⛓️</div>
+                    <div class="step-name">链上存证</div>
+                    <div class="step-sub">调用区块链网关<br>获取 TX ID</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle">✅</div>
+                    <div class="step-name">结果回写</div>
+                    <div class="step-sub">TX ID + 区块高度<br>写入数据库</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:32px;">
+                <div class="card">
+                    <h3 class="sub">🛡️ 核验比对流程</h3>
+                    <ol>
+                        <li>用户输入待验证的族人ID</li>
+                        <li>系统读取数据库原始数据，重新计算 Hash</li>
+                        <li>系统查询区块链网络，获取链上存储的 Hash</li>
+                        <li>两者一致 → <strong style="color:#27ae60">认证通过</strong></li>
+                        <li>两者不符 → <strong style="color:#c0392b">预警报警</strong></li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🏛️ 联盟链平台选型</h3>
+                    <ul>
+                        <li><strong>首选：</strong>省级政务区块链平台（江西/湖南）</li>
+                        <li><strong>备选：</strong>百度超级链 XuperChain</li>
+                        <li><strong>备选：</strong>腾讯 TrustSQL 区块链服务</li>
+                    </ul>
+                    <p style="margin-top:12px;font-size:.85rem;">
+                        <strong>选型理由：</strong>政务链具有法律公信力，已通过商用密码评测认证，符合家谱文化资产属性，且接入成本低于公链。</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:24px;">
+                <h3 class="sub">📦 存证对象范围</h3>
+                <div class="grid-3">
+                    <div>
+                        <strong>核心世系变更</strong>
+                        <p style="font-size:.85rem;margin-top:6px;">始祖确认、大宗分家、重要修谱决议，每次变更均触发链上存证，形成不可篡改的历史记录。</p>
+                    </div>
+                    <div>
+                        <strong>老谱数字资产</strong>
+                        <p style="font-size:.85rem;margin-top:6px;">老谱扫描件的文件哈希值上链存证，确权数字化版权，防止他人侵权使用老谱图片。</p>
+                    </div>
+                    <div>
+                        <strong>宗亲身份认证</strong>
+                        <p style="font-size:.85rem;margin-top:6px;">注册宗亲完成实名认证后，认证结果哈希上链，形成可跨平台核验的数字身份凭证。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 7 隐私与认证 -->
+    <section class="page page-bg" id="ch7">
+        <div class="container">
+            <div class="ch-num">CHAPTER 07</div>
+            <h2 class="ch-title">隐私保护与身份认证</h2>
+            <p class="ch-desc">严格遵循《个人信息保护法》（PIPL）与《数据安全法》，构建三层隐私防护体系。</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 class="sub">🔐 身份认证机制</h3>
+                    <ul>
+                        <li><strong>JWT 无状态鉴权：</strong>Token 有效期 24h，自动刷新</li>
+                        <li><strong>双因素认证（2FA）：</strong>管理员账号强制绑定手机/邮箱验证码</li>
+                        <li><strong>OAuth 2.0：</strong>支持微信/QQ第三方快速登录</li>
+                        <li><strong>实名认证：</strong>宗亲注册需上传证件完成身份核验</li>
+                        <li><strong>登录风控：</strong>异地IP登录、频繁失败触发二次验证</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">🏛️ 分级权限体系</h3>
+                    <ul>
+                        <li><strong>游客（role=0）：</strong>可查看公开世系结构，不显示生卒年、联系方式等敏感信息</li>
+                        <li><strong>注册宗亲（role=1）：</strong>实名认证后可查看本支系详细信息，含生卒年、籍贯全称</li>
+                        <li><strong>分支管理员（role=2）：</strong>可编辑本支系成员数据，审核寻亲申请</li>
+                        <li><strong>超级管理员（role=3）：</strong>全库读写权限，区块链存证触发权</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:24px;">
+                <h3 class="sub">🧬 隐私计算（进阶规划）</h3>
+                <p>对于涉及海外宗亲、基因亲缘数据等高度敏感场景，平台规划引入<strong>零知识证明（ZKP）</strong>技术：无需披露原始基因数据，通过密码学证明"此人确为黄氏后裔"，实现<em>数据可用不可见</em>。同时研究<strong>联邦学习</strong>技术，支持各地谱局在不共享原始数据的前提下联合训练寻亲匹配模型。
+                </p>
+                <p style="margin-top:8px;">合规依据：平台数据处理符合《个人信息保护法》第十三条合法性基础（取得当事人明确同意），以及第二十八条对敏感个人信息的处理规则。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 8 市场分析 -->
+    <section class="page" id="ch8">
+        <div class="container">
+            <div class="ch-num">CHAPTER 08</div>
+            <h2 class="ch-title">市场分析与用户画像</h2>
+            <p class="ch-desc">中华姓氏文化是中国文化数字化的重要赛道，具备清晰的市场分层与用户需求。</p>
+
+            <div class="grid-3" style="margin-bottom:28px;">
+                <div class="card stat-card">
+                    <div class="stat-num">50<span class="stat-unit">亿</span></div>
+                    <div class="stat-label">年修谱市场规模（元）</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-num">18<span class="stat-unit">%</span></div>
+                    <div class="stat-label">年均市场增速</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-num">3.2<span class="stat-unit">亿</span></div>
+                    <div class="stat-label">中国宗族文化关注人群</div>
+                </div>
+            </div>
+
+            <h3 class="sub" style="margin-bottom:16px;">目标用户画像</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>用户类型</th>
+                            <th>核心需求</th>
+                            <th>使用场景</th>
+                            <th>价值贡献</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>寻根型宗亲</strong><br><span style="font-size:.8rem;color:#888">35-60岁，有寻根意愿</span>
+                            </td>
+                            <td>查字辈、找同宗、核验真实性</td>
+                            <td>节假日、家族聚会、清明祭祖</td>
+                            <td>流量主体，口碑传播</td>
+                        </tr>
+                        <tr>
+                            <td><strong>修谱委员会</strong><br><span style="font-size:.8rem;color:#888">各地谱局负责人</span></td>
+                            <td>在线录入更新族谱，协同修谱</td>
+                            <td>修谱期间，数据录入与核验</td>
+                            <td>内容生产核心</td>
+                        </tr>
+                        <tr>
+                            <td><strong>海外宗亲</strong><br><span style="font-size:.8rem;color:#888">东南亚、北美、欧洲华人</span>
+                            </td>
+                            <td>确认祖籍地，寻找国内亲属</td>
+                            <td>返乡认祖、二代华人身份认同</td>
+                            <td>付费意愿强，高价值用户</td>
+                        </tr>
+                        <tr>
+                            <td><strong>文化研究者</strong><br><span style="font-size:.8rem;color:#888">高校、研究机构</span></td>
+                            <td>访问族谱大数据，研究迁徙规律</td>
+                            <td>学术研究，撰写族谱学论文</td>
+                            <td>品牌背书，数据脱敏授权</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 9 路线图 -->
+    <section class="page page-bg" id="ch9">
+        <div class="container">
+            <div class="ch-num">CHAPTER 09</div>
+            <h2 class="ch-title">发展路线图（Roadmap）</h2>
+            <p class="ch-desc">分三阶段推进，从MVP验证到全功能平台，最终实现AI驱动的智能寻亲生态。</p>
+
+            <div class="timeline">
+                <div class="tl-item">
+                    <div class="tl-year">Phase 1 · 2024 Q1-Q3</div>
+                    <div class="tl-title">🚀 MVP 上线</div>
+                    <div class="tl-desc">静态SPA全功能上线 · 伯益-若木-大廉等始祖数据录入 · 江夏/石城/绵阳/福建四大分支字辈库完善 · 留言墙与宗亲互动 ·
+                        完成首批50族人数据区块链存证</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-year">Phase 2 · 2024 Q4 — 2025 Q2</div>
+                    <div class="tl-title">⛓️ 区块链深度集成</div>
+                    <div class="tl-desc">接入省级政务区块链平台 · 后端API服务上线（Spring Boot） · 用户注册与分级权限系统 · 双因素认证（2FA）上线 ·
+                        支持管理员在线修谱，变更实时存证 · 老谱扫描件上传与数字确权</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-year">Phase 3 · 2025 Q3 — 2026</div>
+                    <div class="tl-title">🤖 AI 智能寻亲</div>
+                    <div class="tl-desc">AI 辅助字辈识别（OCR + NLP 解析老谱扫描件） · 智能寻亲匹配算法（基于血缘关系图谱） · 多语言支持（英/马来语）覆盖东南亚宗亲 ·
+                        零知识证明（ZKP）隐私计算引擎 · 移动端APP（iOS + Android）原生应用</div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-year">Phase 4 · 2026+</div>
+                    <div class="tl-title">🌏 全球化生态</div>
+                    <div class="tl-desc">横向扩展至其他大姓（李/王/张/刘）形成平台效应 · 与各地宗亲联合会正式合作 · 基因亲缘数据联邦学习 · 家族文化IP数字藏品 ·
+                        争取列入国家非物质文化遗产数字化保护项目</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 10 风险评估 -->
+    <section class="page" id="ch10">
+        <div class="container">
+            <div class="ch-num">CHAPTER 10</div>
+            <h2 class="ch-title">风险评估与应对策略</h2>
+            <p class="ch-desc">全面识别项目主要风险因素，制定对应管控措施，确保平台稳健运营。</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>风险类别</th>
+                            <th>具体风险</th>
+                            <th>影响级别</th>
+                            <th>应对策略</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>数据安全</strong></td>
+                            <td>族人隐私数据泄露、数据库被攻击</td>
+                            <td><span class="risk-high">高</span></td>
+                            <td>AES-256加密存储、WAF防护、定期渗透测试、数据分级脱敏展示</td>
+                        </tr>
+                        <tr>
+                            <td><strong>数据准确性</strong></td>
+                            <td>录入错误导致世系混乱，影响寻根</td>
+                            <td><span class="risk-high">高</span></td>
+                            <td>多人审核机制、区块链存证锁定历史版本、修改留痕可回滚</td>
+                        </tr>
+                        <tr>
+                            <td><strong>合规监管</strong></td>
+                            <td>族谱数据涉及个人信息，监管政策变化</td>
+                            <td><span class="risk-mid">中</span></td>
+                            <td>严格遵循PIPL，设置隐私官（DPO），每季度合规审查</td>
+                        </tr>
+                        <tr>
+                            <td><strong>区块链</strong></td>
+                            <td>联盟链服务商停运、接口变更</td>
+                            <td><span class="risk-mid">中</span></td>
+                            <td>同时接入2条以上联盟链，保留哈希本地备份，快速切换能力</td>
+                        </tr>
+                        <tr>
+                            <td><strong>数据粗粒度</strong></td>
+                            <td>各地谱局数据格式不统一，合并难度大</td>
+                            <td><span class="risk-mid">中</span></td>
+                            <td>制定黄氏族谱数据标准规范（XML Schema），提供迁移工具</td>
+                        </tr>
+                        <tr>
+                            <td><strong>用户增长</strong></td>
+                            <td>冷启动阶段内容不足，用户流失</td>
+                            <td><span class="risk-low">低</span></td>
+                            <td>联合各省黄氏联合会做首批数据录入，提供免费修谱服务换取用户</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- § 11 团队与声明 -->
+    <section class="page page-bg" id="ch11">
+        <div class="container">
+            <div class="ch-num">CHAPTER 11</div>
+            <h2 class="ch-title">团队与合规声明</h2>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 class="sub">👥 核心团队</h3>
+                    <ul>
+                        <li><strong>技术委员会：</strong>负责平台架构设计与技术落地</li>
+                        <li><strong>族谱顾问组：</strong>各地黄氏联合会负责人，提供族谱数据权威支持</li>
+                        <li><strong>区块链专家：</strong>负责链上存证方案设计与接入</li>
+                        <li><strong>法律顾问：</strong>数据合规与知识产权保护支持</li>
+                        <li><strong>运营委员会：</strong>社群运营与宗亲活动组织</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="sub">📋 合规基础</h3>
+                    <ul>
+                        <li>《个人信息保护法》（PIPL）全面符合</li>
+                        <li>《数据安全法》数据分类分级管理</li>
+                        <li>《网络安全法》等级保护 2.0（建议三级）</li>
+                        <li>商用密码应用方案（SM2/SM3/SM4国密算法）</li>
+                        <li>区块链信息服务备案（工信部）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top:28px;">
+                <p style="text-align:center;color:var(--text-light);font-size:.88rem;line-height:2.2;">
+                    <strong>免责声明</strong><br>
+                    本白皮书仅供参考，不构成任何法律、投资或商业承诺。<br>
+                    所有族谱数据均为演示用途，真实性以各地谱局官方记录为准。<br>
+                    平台保留根据政策与技术发展调整路线图的权利。<br><br>
+                    <strong>版权声明：</strong>© 2024 黄氏家族寻根平台（hxfund.cn）· 保留所有权利<br>
+                    未经授权，不得转载或用于商业用途。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="wp-footer">
+        <div class="f-logo">黄氏宗亲 · 寻根平台</div>
+        <p>hxfund.cn · 项目白皮书 v1.0 · 2024年发布</p>
+        <p>传承家风，继往开来 · 数字化守护千年血脉</p>
+        <p style="margin-top:16px;font-size:.75rem;">
+            如需进一步了解，请访问 <strong style="color:rgba(200,147,58,.7)">hxfund.cn</strong> 或联系项目委员会
+        </p>
+    </div>
+
+</body>
+
+</html>
