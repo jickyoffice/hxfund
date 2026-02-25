@@ -1,0 +1,63 @@
+# 前端部署 - 阿里云虚拟主机
+# 构建并上传到阿里云虚拟主机
+
+name: 前端部署 - 阿里云虚拟主机
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'scripts/build.js'
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  build-and-deploy:
+    name: 构建并部署到阿里云
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 🟢 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 安装依赖
+        run: npm ci
+      
+      - name: 🔨 构建生产版本
+        run: npm run build
+        env:
+          # 生产环境 API 地址（从 Secrets 读取）
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      
+      - name: 📤 上传到阿里云虚拟主机 (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /htdocs/
+          local-dir: ./dist/
+          protocol: ftps
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **.md
+      
+      - name: ✅ 部署完成
+        run: |
+          echo "✅ 前端部署完成！"
+          echo "访问地址：https://hxfund.cn"
+          echo "API 地址：${{ secrets.API_BASE_URL }}"

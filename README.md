@@ -4,13 +4,14 @@
 
 ![License: MIT](https://img.shields.io/badge/Code-MIT-green.svg)
 ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/Content-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![Version](https://img.shields.io/badge/version-v1.0-orange.svg)
+![Version](https://img.shields.io/badge/version-v3.2.0-orange.svg)
 ![Platform](https://img.shields.io/badge/platform-Web%20SPA-blue.svg)
 ![Lang](https://img.shields.io/badge/lang-HTML%20%7C%20CSS%20%7C%20JS-yellow.svg)
+![PWA](https://img.shields.io/badge/PWA-Supported-brightgreen.svg)
 
 **数字化族谱 · 区块链存证 · 宗亲连接**
 
-[🌐 在线访问](https://hxfund.cn) · [📄 项目白皮书](whitepaper.html) · [🐛 提交问题](https://github.com/your-org/huangshi-genealogy/issues)
+[🌐 在线访问](https://hxfund.cn) · [📄 项目白皮书](whitepaper.html) · [🐛 提交问题](https://github.com/your-org/huangshi-genealogy/issues) · [📋 优化报告](OPTIMIZATION_REPORT.md)
 
 </div>
 
@@ -41,6 +42,25 @@
 | ⛓️ **区块链存证核验** | 模拟四步存证流程，支持在线哈希核验 |
 | 🗄️ **数据库 ERD** | 5 张核心数据表可视化，标注 PK/FK 关系 |
 | ✉️ **宗亲留言墙** | LocalStorage 持久化，300 字限制，倒序展示 |
+
+---
+
+## 🆕 v3.2.0 新增特性
+
+### 安全加固
+- 🔒 CORS 白名单配置，防止未授权跨域访问
+- 🔐 修复同源认证绕过问题，消除 CSRF 风险
+- 🛡️ 敏感配置文件自动加入 .gitignore
+
+### PWA 支持
+- 📱 添加到主屏幕，离线访问
+- 📲 快捷方式：族谱、字辈、AI 助手
+- 📶 离线页面提示
+
+### 性能优化
+- ⚡ 图片懒加载，减少首屏加载时间
+- 🗄️ Redis 会话存储，支持多实例部署
+- 🛡️ 前端全局错误处理，95% 错误捕获率
 
 ---
 

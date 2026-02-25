@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # 后端 API 服务
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: huangshi-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ALLOWED_ORIGINS=https://hxfund.cn,https://www.hxfund.cn
+      # Redis 配置（可选）
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      # 挂载日志目录
+      - ./logs:/app/logs
+      # 挂载配置目录（敏感信息）
+      - ./server/config:/app/server/config:ro
+    networks:
+      - huangshi-network
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Redis 缓存（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: huangshi-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - huangshi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: huangshi-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - huangshi-network
+
+networks:
+  huangshi-network:
+    driver: bridge
+
+volumes:
+  redis-data:

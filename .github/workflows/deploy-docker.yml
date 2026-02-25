@@ -1,0 +1,178 @@
+# 后端部署 - Docker 镜像构建与推送
+# 构建 Docker 镜像并部署到阿里云 ECS
+
+name: 后端部署 - Docker
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+      - 'package.json'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  # 镜像仓库配置（阿里云容器镜像服务）
+  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
+  IMAGE_NAME: huangshi-api
+  ECS_HOST: ${{ secrets.ECS_HOST }}
+  ECS_USER: ${{ secrets.ECS_USER }}
+
+jobs:
+  build-and-push:
+    name: 构建并推送镜像
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 🔐 登录阿里云容器镜像服务
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: 🏷️ 生成镜像标签
+        id: meta
+        run: |
+          # 使用 commit SHA 作为标签
+          echo "tag=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "latest=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+      
+      - name: 📦 构建 Docker 镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: |
+            ${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.latest }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+      
+      - name: 🚀 推送镜像到阿里云
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tag }}
+            ${{ steps.meta.outputs.latest }}
+      
+      - name: ✅ 镜像构建完成
+        run: |
+          echo "✅ 镜像已推送到："
+          echo "  - ${{ steps.meta.outputs.tag }}"
+          echo "  - ${{ steps.meta.outputs.latest }}"
+
+  deploy-to-ecs:
+    name: 部署到 ECS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 🔐 设置 SSH 密钥
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ECS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.ECS_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: 📝 创建部署脚本
+        run: |
+          cat > deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          IMAGE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          LATEST_IMAGE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
+          
+          echo "🔄 拉取最新镜像..."
+          docker pull $IMAGE
+          
+          echo "🛑 停止旧容器..."
+          docker stop huangshi-api || true
+          docker rm huangshi-api || true
+          
+          echo "🚀 启动新容器..."
+          docker run -d \
+            --name huangshi-api \
+            --restart unless-stopped \
+            -p 3000:3000 \
+            -e NODE_ENV=production \
+            -e ALLOWED_ORIGINS=https://hxfund.cn,https://www.hxfund.cn \
+            -v /var/www/huangshi-genealogy/logs:/app/logs \
+            -v /var/www/huangshi-genealogy/server/config:/app/server/config:ro \
+            $IMAGE
+          
+          echo "🏷️ 更新 latest 标签..."
+          docker tag $IMAGE $LATEST_IMAGE
+          
+          echo "🧪 健康检查..."
+          sleep 5
+          for i in {1..10}; do
+            if curl -s http://localhost:3000/api/health > /dev/null; then
+              echo "✅ 服务启动成功！"
+              exit 0
+            fi
+            echo "等待服务启动... ($i/10)"
+            sleep 3
+          done
+          
+          echo "❌ 健康检查失败！"
+          docker logs huangshi-api
+          exit 1
+          EOF
+          chmod +x deploy.sh
+      
+      - name: 📤 上传部署脚本到 ECS
+        run: |
+          scp -i ~/.ssh/id_rsa deploy.sh ${{ env.ECS_USER }}@${{ env.ECS_HOST }}:~/deploy.sh
+      
+      - name: 🚀 执行部署
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ env.ECS_USER }}@${{ env.ECS_HOST }} << 'ENDSSH'
+            # 确保 Docker 已安装
+            if ! command -v docker &> /dev/null; then
+              echo "❌ Docker 未安装，请先安装 Docker"
+              exit 1
+            fi
+            
+            # 登录阿里云容器镜像服务
+            docker login --username=${{ secrets.ACR_USERNAME }} --password=${{ secrets.ACR_PASSWORD }} registry.cn-hangzhou.aliyuncs.com
+            
+            # 执行部署脚本
+            bash ~/deploy.sh
+            
+            # 清理
+            rm ~/deploy.sh
+          ENDSSH
+      
+      - name: 📊 查看服务状态
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ env.ECS_USER }}@${{ env.ECS_HOST }} << 'ENDSSH'
+            echo "=== 容器状态 ==="
+            docker ps -a | grep huangshi-api
+            
+            echo "=== 最近日志 ==="
+            docker logs huangshi-api --tail 20
+            
+            echo "=== 健康检查 ==="
+            curl -s http://localhost:3000/api/health | jq || true
+          ENDSSH
+      
+      - name: ✅ 部署完成
+        run: |
+          echo "✅ Docker 部署完成！"
+          echo "API 地址：https://${{ secrets.API_DOMAIN }}"
+          echo "镜像：${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"

@@ -1,0 +1,98 @@
+# 后端部署 - 阿里云 ECS
+# 构建并部署 Node.js 应用到阿里云 ECS
+
+name: 后端部署 - 阿里云 ECS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+      - 'package.json'
+  workflow_dispatch:  # 允许手动触发
+
+env:
+  NODE_VERSION: '18'
+  ECS_HOST: ${{ secrets.ECS_HOST }}
+  ECS_USER: ${{ secrets.ECS_USER }}
+  ECS_KEY: ${{ secrets.ECS_SSH_KEY }}
+  APP_DIR: /var/www/huangshi-genealogy
+
+jobs:
+  build-and-deploy:
+    name: 构建并部署到 ECS
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 🟢 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 安装依赖
+        run: npm ci --production
+      
+      - name: 🔐 设置 SSH 密钥
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ECS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.ECS_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: 📤 上传文件到 ECS
+        run: |
+          # 创建临时部署包
+          tar -czf deploy.tar.gz \
+            server/ \
+            package.json \
+            package-lock.json
+      
+          # 上传到服务器
+          scp -i ~/.ssh/id_rsa deploy.tar.gz ${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }}:~/deploy.tar.gz
+      
+      - name: 🚀 部署到 ECS
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }} << 'ENDSSH'
+            # 停止旧服务
+            cd ${{ env.APP_DIR }}
+            pm2 stop ${{ secrets.APP_NAME }} || true
+            
+            # 备份旧版本
+            cp -r server/ server.backup.$(date +%Y%m%d%H%M%S) || true
+            
+            # 解压新版本
+            rm -rf server/
+            tar -xzf ~/deploy.tar.gz
+            rm ~/deploy.tar.gz
+            
+            # 安装依赖
+            npm install --production
+            
+            # 启动服务
+            pm2 start server/index.js --name ${{ secrets.APP_NAME }}
+            pm2 save
+            
+            # 清理旧备份（保留最近 3 个）
+            ls -t server.backup.* | tail -n +4 | xargs rm -f || true
+          ENDSSH
+      
+      - name: 🧪 健康检查
+        run: |
+          echo "等待服务启动..."
+          sleep 10
+          
+          # 检查服务状态
+          ssh -i ~/.ssh/id_rsa ${{ secrets.ECS_USER }}@${{ secrets.ECS_HOST }} << 'ENDSSH'
+            pm2 status ${{ secrets.APP_NAME }}
+            pm2 logs ${{ secrets.APP_NAME }} --lines 10
+          ENDSSH
+      
+      - name: ✅ 部署完成
+        run: |
+          echo "✅ 后端部署完成！"
+          echo "API 地址：https://${{ secrets.API_DOMAIN }}"
+          echo "服务名称：${{ secrets.APP_NAME }}"

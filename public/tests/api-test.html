@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 测试 - 黄氏家族寻根平台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card h2 .icon { font-size: 1.5em; }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .response-box {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .response-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+        }
+        .response-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .message.user {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .message.ai {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+        .message-content {
+            color: #333;
+            line-height: 1.6;
+        }
+        .message-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+        
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .health-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .health-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .health-item .label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .model-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+        }
+        .model-item.default {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        .model-item .model-id {
+            font-weight: 600;
+            color: #333;
+        }
+        .model-item .model-name {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            color: #667eea;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .hidden { display: none; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 API 测试工具</h1>
+            <p>黄氏家族寻根平台 - Qwen AI API</p>
+        </div>
+        
+        <!-- 健康检查 -->
+        <div class="card">
+            <h2><span class="icon">💚</span> 服务状态</h2>
+            <div id="healthStatus" class="health-grid">
+                <div class="health-item">
+                    <div class="value">检查中...</div>
+                    <div class="label">状态</div>
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="checkHealth()">刷新状态</button>
+            </div>
+        </div>
+        
+        <!-- 模型列表 -->
+        <div class="card">
+            <h2><span class="icon">📚</span> 可用模型</h2>
+            <div id="modelList" class="model-grid">
+                <div class="health-item">加载中...</div>
+            </div>
+            <div class="btn-group" style="margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="loadModels()">刷新列表</button>
+            </div>
+        </div>
+        
+        <!-- 单次对话测试 -->
+        <div class="card">
+            <h2><span class="icon">💬</span> 单次对话测试</h2>
+            <div class="form-group">
+                <label>问题</label>
+                <textarea id="singlePrompt" placeholder="请输入问题，例如：黄姓的起源是什么？">黄姓的起源是什么？</textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>模型</label>
+                    <select id="singleModel">
+                        <option value="qwen3.5-plus">Qwen3.5 Plus (默认)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>温度 (0-2)</label>
+                    <input type="number" id="singleTemp" value="0.7" min="0" max="2" step="0.1">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="testSingleChat()">发送请求</button>
+            </div>
+            <div id="singleResponse" class="response-box hidden">
+                <div class="response-label">响应结果</div>
+                <pre id="singleResponseContent"></pre>
+            </div>
+        </div>
+        
+        <!-- 多轮对话测试 -->
+        <div class="card">
+            <h2><span class="icon">🔄</span> 多轮对话测试</h2>
+            <div class="form-group">
+                <label>当前会话 ID: <span id="currentSessionId">无</span></label>
+            </div>
+            <div class="chat-container" id="chatHistory">
+                <div style="text-align: center; color: #888; padding: 20px;">
+                    暂无对话，发送第一条消息开始对话
+                </div>
+            </div>
+            <div class="form-group">
+                <label>输入消息</label>
+                <textarea id="chatInput" placeholder="输入您想问的问题..." rows="3"></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="sendChatMessage()">发送</button>
+                <button class="btn btn-secondary" onclick="clearChat()">清空对话</button>
+                <button class="btn btn-secondary" onclick="clearSession()">新建会话</button>
+            </div>
+        </div>
+        
+        <!-- 原始请求测试 -->
+        <div class="card">
+            <h2><span class="icon">🔧</span> 自定义请求测试</h2>
+            <div class="form-group">
+                <label>API 端点</label>
+                <input type="text" id="customEndpoint" value="/api/chat" placeholder="/api/...">
+            </div>
+            <div class="form-group">
+                <label>请求方法</label>
+                <select id="customMethod">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>请求体 (JSON)</label>
+                <textarea id="customBody" placeholder='{"prompt": "你好"}'></textarea>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="sendCustomRequest()">发送请求</button>
+            </div>
+            <div id="customResponse" class="response-box hidden">
+                <div class="response-label">响应结果</div>
+                <pre id="customResponseContent"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let sessionId = null;
+        
+        // 检查健康状态
+        async function checkHealth() {
+            const statusDiv = document.getElementById('healthStatus');
+            statusDiv.innerHTML = '<div class="health-item"><div class="value"><span class="loading"></span></div><div class="label">检查中...</div></div>';
+            
+            try {
+                const res = await fetch('/api/health');
+                const data = await res.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="health-item">
+                        <div class="value" style="color: #28a745;">${data.status === 'ok' ? '✓ 正常' : '✗ 异常'}</div>
+                        <div class="label">服务状态</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="value">${data.version}</div>
+                        <div class="label">API 版本</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="value">${data.config.apiKeyConfigured ? '✓' : '✗'}</div>
+                        <div class="label">API Key</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="value">${data.config.sessionsCount}</div>
+                        <div class="label">活动会话</div>
+                    </div>
+                    <div class="health-item">
+                        <div class="value">${data.config.port}</div>
+                        <div class="label">端口</div>
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="health-item" style="grid-column: 1/-1;">
+                        <div class="value" style="color: #dc3545;">✗ 连接失败</div>
+                        <div class="label">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 加载模型列表
+        async function loadModels() {
+            const modelDiv = document.getElementById('modelList');
+            modelDiv.innerHTML = '<div class="health-item"><span class="loading"></span> 加载中...</div>';
+            
+            try {
+                const res = await fetch('/api/models');
+                const data = await res.json();
+                
+                modelDiv.innerHTML = data.models.map(m => `
+                    <div class="model-item ${m.default ? 'default' : ''}">
+                        <div class="model-id">${m.id}</div>
+                        <div class="model-name">${m.name}${m.default ? ' (默认)' : ''}</div>
+                        ${m.description ? `<div class="model-name">${m.description}</div>` : ''}
+                    </div>
+                `).join('');
+                
+                // 更新下拉框
+                const selects = ['singleModel'];
+                selects.forEach(id => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = data.models.map(m => 
+                        `<option value="${m.id}" ${m.default ? 'selected' : ''}>${m.name} (${m.id})</option>`
+                    ).join('');
+                });
+                
+            } catch (error) {
+                modelDiv.innerHTML = `<div class="health-item" style="color: #dc3545;">加载失败：${error.message}</div>`;
+            }
+        }
+        
+        // 单次对话测试
+        async function testSingleChat() {
+            const prompt = document.getElementById('singlePrompt').value.trim();
+            const model = document.getElementById('singleModel').value;
+            const temperature = document.getElementById('singleTemp').value;
+            const responseDiv = document.getElementById('singleResponse');
+            const responseContent = document.getElementById('singleResponseContent');
+            
+            if (!prompt) {
+                alert('请输入问题');
+                return;
+            }
+            
+            responseDiv.classList.remove('hidden');
+            responseContent.textContent = '请求中...';
+            
+            try {
+                const startTime = Date.now();
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, model, temperature })
+                });
+                
+                const data = await res.json();
+                const duration = Date.now() - startTime;
+                
+                if (data.success) {
+                    responseContent.textContent = `响应时间：${duration}ms
+模型：${data.model}
+Token 用量：${data.usage.total_tokens || 0}
+-------------------
+${data.response}`;
+                } else {
+                    responseContent.textContent = `错误：${data.error}`;
+                }
+            } catch (error) {
+                responseContent.textContent = `请求失败：${error.message}`;
+            }
+        }
+        
+        // 多轮对话
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                alert('请输入消息');
+                return;
+            }
+            
+            const historyDiv = document.getElementById('chatHistory');
+            
+            // 添加用户消息
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.innerHTML = `
+                <div class="message-content">${message}</div>
+                <div class="message-meta">您 · ${new Date().toLocaleTimeString()}</div>
+            `;
+            historyDiv.appendChild(userMsg);
+            
+            input.value = '';
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+            
+            // 发送请求
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'message ai';
+            loadingMsg.innerHTML = `
+                <div class="message-content"><span class="loading"></span> AI 思考中...</div>
+            `;
+            historyDiv.appendChild(loadingMsg);
+            
+            try {
+                const startTime = Date.now();
+                const res = await fetch('/api/conversation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        sessionId,
+                        model: document.getElementById('singleModel').value,
+                        temperature: document.getElementById('singleTemp').value
+                    })
+                });
+                
+                const data = await res.json();
+                
+                historyDiv.removeChild(loadingMsg);
+                
+                if (data.success) {
+                    sessionId = data.sessionId;
+                    document.getElementById('currentSessionId').textContent = sessionId;
+                    
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai';
+                    aiMsg.innerHTML = `
+                        <div class="message-content">${data.response.replace(/\n/g, '<br>')}</div>
+                        <div class="message-meta">
+                            Qwen AI · ${new Date().toLocaleTimeString()} · 
+                            耗时：${data.responseTime}ms · 
+                            Token: ${data.usage.total_tokens || 0} · 
+                            消息数：${data.messageCount}
+                        </div>
+                    `;
+                    historyDiv.appendChild(aiMsg);
+                } else {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'message ai';
+                    errorMsg.style.background = '#ffebee';
+                    errorMsg.style.borderLeftColor = '#dc3545';
+                    errorMsg.innerHTML = `
+                        <div class="message-content" style="color: #dc3545;">错误：${data.error}</div>
+                    `;
+                    historyDiv.appendChild(errorMsg);
+                }
+                
+            } catch (error) {
+                historyDiv.removeChild(loadingMsg);
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'message ai';
+                errorMsg.style.background = '#ffebee';
+                errorMsg.innerHTML = `
+                    <div class="message-content" style="color: #dc3545;">请求失败：${error.message}</div>
+                `;
+                historyDiv.appendChild(errorMsg);
+            }
+            
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+        
+        // 清空对话
+        function clearChat() {
+            const historyDiv = document.getElementById('chatHistory');
+            historyDiv.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">暂无对话，发送第一条消息开始对话</div>';
+        }
+        
+        // 新建会话
+        function clearSession() {
+            sessionId = null;
+            document.getElementById('currentSessionId').textContent = '无';
+            clearChat();
+        }
+        
+        // 自定义请求
+        async function sendCustomRequest() {
+            const endpoint = document.getElementById('customEndpoint').value;
+            const method = document.getElementById('customMethod').value;
+            const bodyStr = document.getElementById('customBody').value;
+            const responseDiv = document.getElementById('customResponse');
+            const responseContent = document.getElementById('customResponseContent');
+            
+            responseDiv.classList.remove('hidden');
+            responseContent.textContent = '请求中...';
+            
+            try {
+                const options = {
+                    method,
+                    headers: {}
+                };
+                
+                if (method !== 'GET' && bodyStr.trim()) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = bodyStr;
+                }
+                
+                const startTime = Date.now();
+                const res = await fetch(endpoint, options);
+                const data = await res.json();
+                const duration = Date.now() - startTime;
+                
+                responseContent.textContent = `状态码：${res.status} (${res.ok ? '成功' : '失败'})
+耗时：${duration}ms
+-------------------
+${JSON.stringify(data, null, 2)}`;
+                
+            } catch (error) {
+                responseContent.textContent = `请求失败：${error.message}`;
+            }
+        }
+        
+        // 回车发送消息
+        document.getElementById('chatInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+        
+        // 初始化
+        checkHealth();
+        loadModels();
+    </script>
+</body>
+</html>

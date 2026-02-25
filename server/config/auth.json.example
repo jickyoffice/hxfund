@@ -1,0 +1,16 @@
+{
+  "$schema": "https://example.com/auth-config-schema.json",
+  "_comment": "黄氏家族寻根平台 - 认证配置文件（示例）",
+  "_note": "请复制此文件为 auth.json 并填入真实的 API Key，切勿将 auth.json 提交到 Git！",
+  
+  "serverApiKey": "hs_your_api_key_here",
+  "jwtSecret": "your_jwt_secret_here_min_64_chars",
+  "tokenExpiresIn": 86400000,
+  "rateLimit": {
+    "windowMs": 60000,
+    "maxRequests": 30,
+    "maxChatRequests": 10
+  },
+  "allowedApiKeys": [],
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}

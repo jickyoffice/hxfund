@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen AI 功能测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .error {
+            border-left-color: #f44336;
+            background-color: #ffeaea;
+            color: #d32f2f;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Qwen AI 功能测试</h1>
+        <div class="input-group">
+            <label for="prompt">输入提示:</label>
+            <textarea id="prompt" rows="3" placeholder="请输入您的问题...">介绍一下黄氏家族的历史</textarea>
+        </div>
+        <div class="input-group">
+            <label for="model">选择模型:</label>
+            <select id="model">
+                <option value="qwen3.5-plus">qwen3.5-plus (多模态)</option>
+                <option value="qwen-max">qwen-max</option>
+                <option value="qwen-plus">qwen-plus</option>
+                <option value="qwen-turbo">qwen-turbo</option>
+                <option value="qwen-mini">qwen-mini</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="temperature">温度 (Temperature):</label>
+            <input type="number" id="temperature" min="0" max="2" step="0.1" value="0.7">
+        </div>
+        <button id="sendBtn">发送请求</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const prompt = document.getElementById('prompt').value;
+            const model = document.getElementById('model').value;
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const resultDiv = document.getElementById('result');
+            
+            if (!prompt.trim()) {
+                alert('请输入提示内容');
+                return;
+            }
+            
+            // 显示加载状态
+            resultDiv.innerHTML = '<div class="loading">正在请求AI服务...</div>';
+            document.getElementById('sendBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/qwen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        model: model,
+                        temperature: temperature
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+                
+                resultDiv.className = 'result';
+                resultDiv.innerHTML = `<strong>AI回复:</strong>\n${data.response}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>错误:</strong>\n${error.message}`;
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+            }
+        });
+        
+        // 页面加载完成后自动执行一次测试
+        window.addEventListener('load', () => {
+            // 不自动执行，避免意外调用API
+            console.log('Qwen AI 测试页面已加载');
+        });
+    </script>
+</body>
+</html>

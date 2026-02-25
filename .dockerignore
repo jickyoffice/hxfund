@@ -1,0 +1,28 @@
+# Docker 忽略文件
+node_modules
+npm-debug.log
+.git
+.gitignore
+*.md
+.env
+.env.*
+!.env.example
+dist
+build
+coverage
+.nyc_output
+.vscode
+.idea
+*.log
+logs
+*.tar.gz
+deploy.tar.gz
+
+# 敏感配置
+server/config/auth.json
+server/config/.env
+
+# Docker 相关文件（避免递归）
+Dockerfile
+docker-compose*.yml
+.docker/
